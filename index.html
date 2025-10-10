@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class=""> <!-- A classe 'dark' será adicionada aqui via JS -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cred VIP - Protótipo Completo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Cores principais da marca */
+        .brand-bg { background-color: #032aab; }
+        .brand-text { color: #032aab; }
+
+        #login-screen {
+            background: linear-gradient(160deg, #032aab, #043cdd);
+        }
+        #login-screen input:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Animação para as formas no fundo do login */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0.1; }
+            50% { transform: translateY(-25px) rotate(45deg); opacity: 0.3; }
+            100% { transform: translateY(0px) rotate(0deg); opacity: 0.1; }
+        }
+        .shape {
+            position: absolute;
+            border-radius: 2rem;
+            background-color: white;
+            animation: float 10s ease-in-out infinite;
+        }
+        .shape1 { width: 150px; height: 150px; top: 10%; left: 5%; animation-duration: 12s; }
+        .shape2 { width: 80px; height: 80px; top: 75%; left: 85%; animation-duration: 8s; }
+        .shape3 { width: 50px; height: 50px; top: 15%; left: 80%; animation-duration: 10s; }
+        .shape4 { width: 120px; height: 120px; top: 80%; left: 10%; animation-duration: 9s; }
+
+        /* Gradientes para o menu lateral */
+        .gradient-salario { background: linear-gradient(135deg, #d8d7db, #c4c3c7); }
+        .gradient-servidor { background: linear-gradient(135deg, #f5d07a, #ebb34a); }
+        .gradient-private { background: linear-gradient(135deg, #a17dc7, #855ca0); }
+        .gradient-presente { background: linear-gradient(135deg, #5fb4e3, #339dd5); }
+        .gradient-alimentacao { background: linear-gradient(135deg, #6ecfa9, #4eb999); }
+        
+        /* Novo gradiente azul padrão para os cartões */
+        .gradient-brand-blue { background: linear-gradient(135deg, #043cdd, #032aab); }
+
+        :root { --accent-color: #c4c3c7; }
+        .text-accent { color: var(--accent-color); }
+        .bg-accent { background-color: var(--accent-color); }
+        .border-accent { border-color: var(--accent-color); }
+        .card-carousel::-webkit-scrollbar { display: none; }
+        .card-carousel { -ms-overflow-style: none; scrollbar-width: none; overflow-x: auto; scroll-behavior: smooth; }
+        
+        .modal-backdrop, .sidebar-backdrop { transition: opacity 0.3s ease; }
+        .modal-content, #sidebar, .sub-modal { transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; }
+        .history-tab.active { color: #032aab; border-color: #032aab; }
+        .dark .history-tab.active { color: #5fb4e3; border-color: #5fb4e3; }
+        /* Estilo para switch toggle */
+        .toggle-checkbox:checked + .toggle-label { background-color: #032aab; }
+        .toggle-checkbox:checked + .toggle-label .toggle-ball { transform: translateX(1.25rem); }
+
+        .card-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-item.active {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+
+    <!-- Tela de Login -->
+    <div id="login-screen" class="relative overflow-hidden flex flex-col items-center justify-center min-h-screen p-6 text-white">
+        <!-- Formas animadas no fundo -->
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+        <div class="shape shape3"></div>
+        <div class="shape shape4"></div>
+
+        <div class="relative z-10 w-full max-w-sm text-center bg-white/10 backdrop-blur-sm p-8 rounded-2xl shadow-lg">
+            <img src="assets/img/logo.png" alt="Logo Cred VIP" class="h-12 mb-2 mx-auto logo">
+            <h1 class="text-2xl font-bold mb-1">Bem-vindo(a)</h1>
+            <p class="opacity-80 mb-8">Controle na palma da sua mão.</p>
+            
+            <div class="space-y-6 text-left">
+                <div>
+                    <label for="cpf" class="block text-sm font-medium opacity-80 mb-1">CPF / CNPJ</label>
+                    <div class="mt-1">
+                        <input id="cpf" name="cpf" type="text" autocomplete="cpf" required class="w-full p-3 rounded-lg bg-white/20 placeholder-white/60 border-2 border-transparent focus:border-white focus:outline-none transition-shadow" placeholder="000.000.000-00">
+                    </div>
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium opacity-80 mb-1">Senha</label>
+                    <div class="mt-1 relative">
+                        <input id="password" name="password" type="password" autocomplete="current-password" required class="w-full p-3 pr-12 rounded-lg bg-white/20 placeholder-white/60 border-2 border-transparent focus:border-white focus:outline-none transition-shadow" placeholder="Sua senha">
+                        <button id="toggle-password" type="button" class="absolute inset-y-0 right-0 pr-4 flex items-center text-white/70 hover:text-white">
+                            <i id="password-eye-icon" class="fa-solid fa-eye-slash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-blue-300 focus:ring-blue-500 border-gray-300 rounded bg-transparent">
+                        <label for="remember-me" class="ml-2 block opacity-80">Lembrar-me</label>
+                    </div>
+                    <div class="text-sm">
+                        <button data-feedback-title="Recuperação de Senha" data-feedback-message="Um link para redefinição de senha foi enviado para o seu e-mail cadastrado." class="interactive-button font-medium hover:underline opacity-80 hover:opacity-100">Esqueceu sua senha?</button>
+                    </div>
+                </div>
+                <div>
+                    <button id="login-button" class="w-full bg-white text-lg brand-text font-bold p-4 rounded-lg hover:bg-gray-200 transition">Entrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- App Principal (Inicialmente escondido) -->
+    <div id="app-container" class="hidden flex-col h-screen min-h-screen">
+        
+        <!-- Sidebar (Menu Lateral) -->
+        <div id="sidebar-container" class="fixed inset-0 z-50 hidden">
+            <div id="sidebar-backdrop" class="sidebar-backdrop absolute inset-0 bg-black/50"></div>
+            <div id="sidebar" class="relative z-10 w-80 h-full bg-white dark:bg-gray-900 shadow-lg flex flex-col -translate-x-full">
+                <div id="sidebar-header" class="p-6 text-white flex items-center gap-4 transition-colors duration-500">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center shadow-inner"><i class="fa-solid fa-user text-3xl"></i></div>
+                    <div>
+                        <h2 class="text-xl font-bold">Maria Silva</h2>
+                        <p class="text-sm opacity-80">ag. 0001 c. 12345-6</p>
+                    </div>
+                </div>
+                <nav class="flex-grow p-4 space-y-2">
+                    <button data-modal-target="perfil-modal" class="w-full flex items-center gap-4 p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 text-left"><i class="fa-regular fa-user-circle w-6 text-center text-xl"></i> Meu Perfil</button>
+                    <button data-modal-target="configuracoes-modal" class="w-full flex items-center gap-4 p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 text-left"><i class="fa-solid fa-sliders w-6 text-center text-xl"></i> Configurações</button>
+                </nav>
+                <div class="p-4 border-t border-gray-200 dark:border-gray-800">
+                    <button id="logout-button" class="w-full flex items-center gap-4 p-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30">
+                        <i class="fa-solid fa-right-from-bracket w-6 text-center text-xl"></i> Sair da conta
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <header class="sticky top-0 z-30 flex items-center justify-between p-4 brand-bg text-white shadow-md">
+  
+            <!-- Botão do menu à esquerda -->
+            <div class="flex items-center gap-4">
+                <button id="menu-button" class="w-10 h-10 -ml-2 rounded-full flex items-center justify-center hover:bg-white/20 transition">
+                <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Logo centralizada -->
+            <div class="absolute left-1/2 transform -translate-x-1/2">
+                <img src="assets/img/logo.png" alt="Logo Cred VIP" class="h-10 logo">
+            </div>
+            
+            <!-- Botões à direita -->
+            <div class="flex items-center gap-2">
+                <button id="theme-toggle" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/20 transition">
+                <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+                <button id="notifications-button" data-modal-target="notifications-modal" class="relative w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/20 transition">
+                <i class="fa-regular fa-bell text-lg"></i>
+                <span id="notification-dot" class="absolute top-1.5 right-1.5 w-3 h-3 bg-red-500 rounded-full border-2 brand-bg"></span>
+                </button>
+            </div>
+
+        </header>
+
+
+        <!-- Conteúdo principal rolável -->
+        <main class="flex-grow p-4 sm:p-6 lg:p-8 overflow-y-auto bg-white dark:bg-black">
+             <!-- Seção de Cartões Redesenhada -->
+            <div>
+                <div class="flex flex-wrap justify-between items-baseline gap-2 mb-2">
+                    <h1 class="text-xl font-bold text-gray-800 dark:text-gray-200">Meus Cartões</h1>
+                    <div id="card-info-display" class="text-right">
+                        <p id="balance-label" class="text-sm text-gray-500 dark:text-gray-400"></p>
+                        <div class="flex items-center justify-end gap-2">
+                            <p id="card-balance" class="text-2xl font-bold text-gray-900 dark:text-white transition-all"></p>
+                            <button id="toggle-balance" class="text-gray-400 hover:text-gray-800 dark:text-gray-500 dark:hover:text-white">
+                                 <i id="balance-eye-icon" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="card-carousel" class="card-carousel flex gap-4 mb-4 pb-2 pt-4"></div>
+            </div>
+
+            <div class="mt-8">
+                <div>
+                     <h2 class="font-bold text-gray-800 dark:text-gray-200 text-lg mb-4">Ações Rápidas</h2>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-gray-700 dark:text-gray-300">
+                        <button data-modal-target="extrato-modal" class="action-button flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"><div class="w-16 h-16 rounded-2xl bg-gray-200 dark:bg-gray-800 flex items-center justify-center shadow-sm mb-2 transition"><i class="fa-solid fa-receipt text-2xl text-accent"></i></div><span class="text-xs font-medium">Extrato</span></button>
+                        <button data-modal-target="pagar-modal" class="action-button flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"><div class="w-16 h-16 rounded-2xl bg-gray-200 dark:bg-gray-800 flex items-center justify-center shadow-sm mb-2 transition"><i class="fa-solid fa-qrcode text-2xl text-accent"></i></div><span class="text-xs font-medium">Pagar</span></button>
+                        <div class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"><div id="block-button" class="w-16 h-16 rounded-2xl bg-gray-200 dark:bg-gray-800 flex items-center justify-center shadow-sm mb-2 cursor-pointer transition"><i id="block-icon" class="fa-solid fa-lock text-2xl text-accent"></i></div><span id="block-text" class="text-xs font-medium">Bloquear</span></div>
+                        <button data-modal-target="lojas-modal" class="action-button flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"><div class="w-16 h-16 rounded-2xl bg-gray-200 dark:bg-gray-800 flex items-center justify-center shadow-sm mb-2 transition"><i class="fa-solid fa-store text-2xl text-accent"></i></div><span class="text-xs font-medium">Lojas</span></button>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <div>
+                        <h2 class="font-bold text-gray-800 dark:text-gray-200 text-lg mb-4">Histórico de compras</h2>
+                        <div id="history-tabs" class="flex gap-4 border-b border-gray-200 dark:border-gray-700 mb-4 text-sm font-semibold text-gray-500 dark:text-gray-400">
+                            <button class="history-tab py-2 border-b-2 active" data-category="Todas">Todas</button>
+                            <button class="history-tab py-2 border-b-2 border-transparent" data-category="Alimentação">Alimentação</button>
+                            <button class="history-tab py-2 border-b-2 border-transparent" data-category="Transporte">Transporte</button>
+                            <button class="history-tab py-2 border-b-2 border-transparent" data-category="Lazer">Lazer</button>
+                        </div>
+                        <div id="transaction-list" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Menu de Navegação Inferior -->
+        <nav class="bg-white/80 dark:bg-black/80 backdrop-blur-md w-full p-2 flex-shrink-0 border-t border-gray-200 dark:border-gray-800 lg:hidden sticky bottom-0">
+            <div id="nav-bar" class="flex justify-around">
+                <button data-nav="inicio" class="nav-button flex flex-col items-center brand-text p-2 rounded-lg w-20"><i class="fa-solid fa-house text-xl mb-1"></i><span class="text-xs font-bold">Início</span></button>
+                <button data-nav="cartoes" data-modal-target="cartoes-modal" class="nav-button flex flex-col items-center text-gray-500 dark:text-gray-400 p-2 rounded-lg w-20"><i class="fa-regular fa-credit-card text-xl mb-1"></i><span class="text-xs">Cartões</span></button>
+                <button data-nav="comprar" data-modal-target="comprar-modal" class="nav-button flex flex-col items-center text-gray-500 dark:text-gray-400 p-2 rounded-lg w-20"><i class="fa-solid fa-bag-shopping text-xl mb-1"></i><span class="text-xs">Comprar</span></button>
+                <button data-nav="ajuda" data-modal-target="ajuda-modal" class="nav-button flex flex-col items-center text-gray-500 dark:text-gray-400 p-2 rounded-lg w-20"><i class="fa-regular fa-circle-question text-xl mb-1"></i><span class="text-xs">Ajuda</span></button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Modals -->
+    <div id="notifications-modal" class="modal fixed inset-0 z-50 hidden items-center justify-center"><div class="modal-backdrop absolute inset-0 bg-black/50"></div><div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-md p-6 relative scale-95"><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Notificações</h3><div class="flex items-center gap-4"><button id="mark-as-read-btn" class="text-sm brand-text hover:underline">Marcar como lida</button><button class="modal-close text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">&times;</button></div></div><div class="space-y-3 max-h-96 overflow-y-auto"><div class="notification-item p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex items-start gap-3 border-l-4 border-blue-500"><i class="fa-solid fa-shopping-cart text-blue-500 mt-1"></i><div><p class="text-sm text-gray-800 dark:text-gray-200">Compra de R$ 250,40 aprovada em <strong>Supermercado Compre Bem</strong>.</p><p class="text-xs text-gray-500 dark:text-gray-400">Hoje, 09:32</p></div></div><div class="notification-item p-3 bg-green-50 dark:bg-green-900/30 rounded-lg flex items-start gap-3 border-l-4 border-green-500"><i class="fa-solid fa-file-invoice-dollar text-green-500 mt-1"></i><div><p class="text-sm text-gray-800 dark:text-gray-200">O saldo do seu <strong>Vale Alimentação</strong> foi carregado.</p><p class="text-xs text-gray-500 dark:text-gray-400">Ontem, 18:00</p></div></div><div class="notification-item p-3 rounded-lg flex items-start gap-3"><i class="fa-solid fa-triangle-exclamation text-yellow-500 mt-1"></i><div><p class="text-sm text-gray-800 dark:text-gray-200">Lembrete: A fatura do seu <strong>Cartão Servidor</strong> vence em 3 dias.</p><p class="text-xs text-gray-500 dark:text-gray-400">3 dias atrás</p></div></div></div></div></div>
+    <div id="extrato-modal" class="modal fixed inset-0 z-50 hidden items-center justify-center"><div class="modal-backdrop absolute inset-0 bg-black/50"></div><div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-lg p-6 relative scale-95"><h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">Extrato Completo</h3><div class="space-y-4 mb-4"><input id="extrato-search" type="text" placeholder="Pesquisar por nome..." class="w-full p-2 rounded-lg bg-gray-100 dark:bg-gray-700 border-transparent focus:border-brand-text/50 focus:ring-brand-text/50 dark:text-gray-300"><div class="flex gap-2"><select id="extrato-filter-type" class="flex-1 p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm border-transparent focus:border-brand-text/50 focus:ring-brand-text/50 dark:text-gray-300"><option value="Todas">Todas</option><option value="Entradas">Entradas</option><option value="Saídas">Saídas</option></select><select id="extrato-filter-category" class="flex-1 p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm border-transparent focus:border-brand-text/50 focus:ring-brand-text/50 dark:text-gray-300"><option value="Todas">Categorias</option><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Contas">Contas</option></select></div></div><div id="extrato-modal-list" class="space-y-2 max-h-80 overflow-y-auto"></div><button class="modal-close absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">&times;</button></div></div>
+    <div id="pagar-modal" class="modal fixed inset-0 z-50 hidden items-center justify-center"><div class="modal-backdrop absolute inset-0 bg-black/50"></div><div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-md p-6 relative scale-95 overflow-hidden"><div id="pay-main" class="sub-modal"><h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-6">Área de Pagamentos</h3><div class="space-y-3"><button class="sub-modal-trigger w-full flex items-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition" data-target="pay-transferir"><i class="fa-solid fa-money-bill-transfer text-xl brand-text w-8 text-center"></i><div class="ml-4 text-left"><p class="font-semibold text-gray-800 dark:text-gray-200">Transferir</p><p class="text-xs text-gray-500 dark:text-gray-400">Envie dinheiro para outras contas.</p></div></button><button class="sub-modal-trigger w-full flex items-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition" data-target="pay-pix"><i class="fa-brands fa-pix text-2xl brand-text w-8 text-center"></i><div class="ml-4 text-left"><p class="font-semibold text-gray-800 dark:text-gray-200">Área Pix</p><p class="text-xs text-gray-500 dark:text-gray-400">Pagar, transferir ou cobrar.</p></div></button><button class="sub-modal-trigger w-full flex items-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition" data-target="pay-qrcode"><i class="fa-solid fa-qrcode text-xl text-gray-600 dark:text-gray-300 w-8 text-center"></i><div class="ml-4 text-left"><p class="font-semibold text-gray-800 dark:text-gray-200">Pagar com QR Code</p><p class="text-xs text-gray-500 dark:text-gray-400">Use a câmera para pagar.</p></div></button><button class="sub-modal-trigger w-full flex items-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition" data-target="pay-barcode"><i class="fa-solid fa-barcode text-xl text-gray-600 dark:text-gray-300 w-8 text-center"></i><div class="ml-4 text-left"><p class="font-semibold text-gray-800 dark:text-gray-200">Pagar Boleto</p><p class="text-xs text-gray-500 dark:text-gray-400">Leia o código de barras.</p></div></button></div></div><div id="pay-transferir" class="sub-modal absolute inset-0 bg-white dark:bg-gray-800 p-6 flex flex-col translate-x-full opacity-0"><button class="sub-modal-back text-sm font-semibold brand-text mb-4 flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Voltar</button><h4 class="font-bold text-lg mb-4">Transferir</h4><div class="space-y-3"><input id="transfer-ag" type="text" placeholder="Agência" class="w-full p-2 rounded-lg bg-gray-100 dark:bg-gray-700"><input id="transfer-conta" type="text" placeholder="Conta com dígito" class="w-full p-2 rounded-lg bg-gray-100 dark:bg-gray-700"><input id="transfer-valor" type="text" placeholder="Valor" class="w-full p-2 rounded-lg bg-gray-100 dark:bg-gray-700"></div><button id="transfer-continue-btn" class="sub-modal-trigger mt-auto w-full brand-bg text-white font-bold p-3 rounded-lg" data-target="pay-transferir-confirmar">Continuar</button></div><div id="pay-transferir-confirmar" class="sub-modal absolute inset-0 bg-white dark:bg-gray-800 p-6 flex flex-col translate-x-full opacity-0"><button class="sub-modal-back text-sm font-semibold brand-text mb-4 flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Voltar</button><h4 class="font-bold text-lg mb-4">Confirmar Transferência</h4><div id="transfer-summary" class="space-y-2 text-sm p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"></div><button data-feedback-title="Transferência Agendada" data-feedback-message="Sua transferência foi agendada com sucesso e será processada." class="interactive-button mt-auto w-full brand-bg text-white font-bold p-3 rounded-lg">Confirmar</button></div><div id="pay-pix" class="sub-modal absolute inset-0 bg-white dark:bg-gray-800 p-6 flex flex-col translate-x-full opacity-0"><button class="sub-modal-back text-sm font-semibold brand-text mb-4 flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Voltar</button><h4 class="font-bold text-lg mb-4">Área Pix</h4><div class="grid grid-cols-2 gap-3 text-center"><button class="sub-modal-trigger flex flex-col items-center justify-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg" data-target="pay-qrcode"><i class="fa-solid fa-qrcode text-xl mb-1"></i><span class="text-xs font-medium">Ler QR Code</span></button><button class="sub-modal-trigger flex flex-col items-center justify-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg" data-target="pay-pix-copia-cola"><i class="fa-solid fa-paste text-xl mb-1"></i><span class="text-xs font-medium">Pix Copia e Cola</span></button><button class="interactive-button flex flex-col items-center justify-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg" data-feedback-title="Chave Aleatória" data-feedback-message="Chave aleatória gerada e copiada."><i class="fa-solid fa-shuffle text-xl mb-1"></i><span class="text-xs font-medium">Chave Aleatória</span></button><button class="sub-modal-trigger flex flex-col items-center justify-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg" data-target="pay-pix-minhas-chaves"><i class="fa-solid fa-key text-xl mb-1"></i><span class="text-xs font-medium">Minhas Chaves</span></button></div></div><div id="pay-pix-copia-cola" class="sub-modal absolute inset-0 bg-white dark:bg-gray-800 p-6 flex flex-col translate-x-full opacity-0"><button class="sub-modal-back text-sm font-semibold brand-text mb-4 flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Voltar</button><h4 class="font-bold text-lg mb-4">Pix Copia e Cola</h4><textarea placeholder="Cole o código Pix aqui..." class="w-full flex-grow p-2 rounded-lg bg-gray-100 dark:bg-gray-700"></textarea><button data-feedback-title="Código Inválido" data-feedback-message="Não foi possível identificar o código Pix. Tente novamente." class="interactive-button mt-4 w-full brand-bg text-white font-bold p-3 rounded-lg">Continuar</button></div><div id="pay-pix-minhas-chaves" class="sub-modal absolute inset-0 bg-white dark:bg-gray-800 p-6 flex flex-col translate-x-full opacity-0"><button class="sub-modal-back text-sm font-semibold brand-text mb-4 flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Voltar</button><h4 class="font-bold text-lg mb-4">Minhas Chaves Pix</h4><div class="space-y-3"><div class="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-700 rounded-lg"><p class="text-sm font-medium"><strong>CPF:</strong> ***.456.***-**</p><button class="interactive-button text-sm brand-text" data-feedback-title="Chave Copiada" data-feedback-message="Chave CPF copiada para a área de transferência."><i class="fa-regular fa-copy"></i></button></div><div class="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-700 rounded-lg"><p class="text-sm font-medium"><strong>E-mail:</strong> m***@email.com</p><button class="interactive-button text-sm brand-text" data-feedback-title="Chave Copiada" data-feedback-message="Chave E-mail copiada para a área de transferência."><i class="fa-regular fa-copy"></i></button></div></div><button data-feedback-title="Nova Chave" data-feedback-message="Tela para criação de nova chave Pix." class="interactive-button mt-auto w-full bg-gray-200 dark:bg-gray-600 font-bold p-3 rounded-lg">Cadastrar Nova Chave</button></div><div id="pay-qrcode" class="sub-modal absolute inset-0 bg-white dark:bg-gray-800 p-6 flex flex-col translate-x-full opacity-0"><button class="sub-modal-back text-sm font-semibold brand-text mb-4 flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Voltar</button><h4 class="font-bold text-lg mb-4 text-center">Aponte para o QR Code</h4><div class="flex-grow flex items-center justify-center bg-gray-800 rounded-lg"><div class="w-48 h-48 border-4 border-dashed border-white/50"></div></div></div><div id="pay-barcode" class="sub-modal absolute inset-0 bg-white dark:bg-gray-800 p-6 flex flex-col translate-x-full opacity-0"><button class="sub-modal-back text-sm font-semibold brand-text mb-4 flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Voltar</button><h4 class="font-bold text-lg mb-4 text-center">Aponte para o Código de Barras</h4><div class="flex-grow flex items-center justify-center bg-gray-800 rounded-lg"><div class="w-64 h-24 border-4 border-dashed border-white/50"></div></div></div><button class="modal-close absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">&times;</button></div></div>
+    <div id="lojas-modal" class="modal fixed inset-0 z-50 hidden items-center justify-center"><div class="modal-backdrop absolute inset-0 bg-black/50"></div><div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-lg p-6 relative scale-95"><h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">Rede Credenciada</h3><div class="relative mb-4"><input type="text" placeholder="Buscar por nome ou endereço" class="w-full p-2 pl-10 rounded-lg bg-gray-100 dark:bg-gray-700 border-transparent focus:border-brand-text/50 focus:ring-brand-text/50 dark:text-gray-300"><i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i></div><div class="w-full h-48 bg-gray-200 dark:bg-gray-800 rounded-lg mb-4 overflow-hidden relative"><svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><g class="dark:opacity-50"><line x1="10%" y1="0" x2="10%" y2="100%" stroke="#d1d5db" stroke-width="2"/><line x1="50%" y1="0" x2="50%" y2="100%" stroke="#d1d5db" stroke-width="4"/><line x1="80%" y1="0" x2="80%" y2="100%" stroke="#d1d5db" stroke-width="2"/><line x1="0" y1="30%" x2="100%" y2="30%" stroke="#e5e7eb" stroke-width="2"/><line x1="0" y1="70%" x2="100%" y2="70%" stroke="#d1d5db" stroke-width="3"/></g><circle cx="50%" cy="50%" r="8" fill="#3b82f6" opacity="0.5"/><circle cx="50%" cy="50%" r="5" fill="#3b82f6"/><text x="52%" y="48%" font-size="10" fill="white" font-weight="bold">Você</text><g transform="translate(80, 40)"><path d="M0,0 C-5,-5 -10,-15 0,-20 C10,-15 5,-5 0,0 Z" fill="var(--accent-color)"/><circle cx="0" cy="-12" r="3" fill="white"/></g><g transform="translate(200, 120)"><path d="M0,0 C-5,-5 -10,-15 0,-20 C10,-15 5,-5 0,0 Z" fill="var(--accent-color)"/><circle cx="0" cy="-12" r="3" fill="white"/></g><g transform="translate(30, 150)"><path d="M0,0 C-5,-5 -10,-15 0,-20 C10,-15 5,-5 0,0 Z" fill="var(--accent-color)"/><circle cx="0" cy="-12" r="3" fill="white"/></g></svg></div><div class="space-y-3 max-h-60 overflow-y-auto"><div class="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-shopping-cart text-accent text-2xl w-6 text-center"></i><div><p class="font-semibold text-gray-800 dark:text-gray-200">Supermercado Compre Bem</p><p class="text-sm text-gray-500 dark:text-gray-400">Rua das Flores, 123 - <strong>0.8 km</strong></p></div></div><div class="flex items-center gap-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-gas-pump text-accent text-2xl w-6 text-center"></i><div><p class="font-semibold text-gray-800 dark:text-gray-200">Posto Central</p><p class="text-sm text-gray-500 dark:text-gray-400">Av. Principal, 500 - <strong>1.2 km</strong></p></div></div></div><button class="modal-close absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">&times;</button></div></div>
+    <div id="cartoes-modal" class="modal fixed inset-0 z-50 hidden items-center justify-center"><div class="modal-backdrop absolute inset-0 bg-black/50"></div><div id="cartoes-modal-content" class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-md p-6 relative scale-95 overflow-hidden"><div id="manage-card-main" class="sub-modal"><h3 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-200">Gerenciar Cartão</h3><div id="cartoes-modal-card-info" class="mb-6"></div><div class="space-y-3 text-sm"><button class="sub-modal-trigger w-full text-left bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-3 rounded-lg text-gray-800 dark:text-gray-200 font-semibold transition flex justify-between items-center" data-target="manage-card-segunda-via"><span>Solicitar 2ª via</span><i class="fa-solid fa-chevron-right"></i></button><button class="sub-modal-trigger w-full text-left bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-3 rounded-lg text-gray-800 dark:text-gray-200 font-semibold transition flex justify-between items-center" data-target="manage-card-senha"><span>Alterar senha</span><i class="fa-solid fa-chevron-right"></i></button><button class="sub-modal-trigger w-full text-left bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-3 rounded-lg text-gray-800 dark:text-gray-200 font-semibold transition flex justify-between items-center" data-target="manage-card-limites"><span>Ver limites</span><i class="fa-solid fa-chevron-right"></i></button><button class="sub-modal-trigger w-full text-left bg-red-100 dark:bg-red-900/50 hover:bg-red-200 dark:hover:bg-red-900/80 p-3 rounded-lg text-red-600 dark:text-red-400 font-semibold transition flex justify-between items-center" data-target="manage-card-cancelar"><span>Cancelar cartão</span><i class="fa-solid fa-triangle-exclamation"></i></button></div></div><div id="manage-card-segunda-via" class="sub-modal absolute inset-0 bg-white dark:bg-gray-800 p-6 flex flex-col translate-x-full opacity-0"><button class="sub-modal-back text-sm font-semibold brand-text mb-4 flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Voltar</button><h4 class="font-bold text-lg mb-2">Solicitar 2ª Via</h4><p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Confirme seu endereço de entrega para o novo cartão.</p><div class="text-sm p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">Rua das Flores, 123<br>Centro, Cidade-UF<br>CEP: 12345-678</div><button data-feedback-title="Solicitação Enviada" data-feedback-message="Sua solicitação de segunda via foi enviada. O novo cartão chegará em seu endereço em até 15 dias úteis." class="interactive-button mt-auto w-full brand-bg text-white font-bold p-3 rounded-lg">Confirmar Solicitação</button></div><div id="manage-card-senha" class="sub-modal absolute inset-0 bg-white dark:bg-gray-800 p-6 flex flex-col translate-x-full opacity-0"><button class="sub-modal-back text-sm font-semibold brand-text mb-4 flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Voltar</button><h4 class="font-bold text-lg mb-4">Alterar Senha</h4><div class="space-y-3"><input type="password" placeholder="Senha atual" class="w-full p-2 rounded-lg bg-gray-100 dark:bg-gray-700"><input type="password" placeholder="Nova senha" class="w-full p-2 rounded-lg bg-gray-100 dark:bg-gray-700"><input type="password" placeholder="Confirmar nova senha" class="w-full p-2 rounded-lg bg-gray-100 dark:bg-gray-700"></div><button data-feedback-title="Senha Alterada" data-feedback-message="Sua senha foi alterada com sucesso." class="interactive-button mt-auto w-full brand-bg text-white font-bold p-3 rounded-lg">Salvar Nova Senha</button></div><div id="manage-card-limites" class="sub-modal absolute inset-0 bg-white dark:bg-gray-800 p-6 flex flex-col translate-x-full opacity-0"><button class="sub-modal-back text-sm font-semibold brand-text mb-4 flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Voltar</button><h4 class="font-bold text-lg mb-4">Meus Limites</h4><div class="space-y-4"><h5 class="font-semibold text-sm">Limite de Compra</h5><div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5"><div class="bg-green-500 h-2.5 rounded-full" style="width: 25%"></div></div><p class="text-xs text-right">R$ 1.150,00 de R$ 5.000,00</p><h5 class="font-semibold text-sm">Limite de Saque</h5><div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5"><div class="bg-blue-500 h-2.5 rounded-full" style="width: 80%"></div></div><p class="text-xs text-right">R$ 200,00 de R$ 1.000,00</p></div><button class="sub-modal-back mt-auto w-full bg-gray-200 dark:bg-gray-700 font-bold p-3 rounded-lg">Fechar</button></div><div id="manage-card-cancelar" class="sub-modal absolute inset-0 bg-white dark:bg-gray-800 p-6 flex flex-col translate-x-full opacity-0"><button class="sub-modal-back text-sm font-semibold brand-text mb-4 flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Voltar</button><h4 class="font-bold text-lg text-red-500 mb-2">Cancelar Cartão</h4><p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Esta ação é irreversível. Para confirmar, digite "CANCELAR" no campo abaixo.</p><input type="text" placeholder="CANCELAR" class="w-full p-2 rounded-lg bg-gray-100 dark:bg-gray-700 mb-4"><button data-feedback-title="Cartão Cancelado" data-feedback-message="Seu cartão foi cancelado permanentemente." class="interactive-button w-full bg-red-500 text-white font-bold p-3 rounded-lg">Confirmar Cancelamento</button></div><button class="modal-close absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">&times;</button></div></div>
+    <div id="comprar-modal" class="modal fixed inset-0 z-50 hidden items-center justify-center"><div class="modal-backdrop absolute inset-0 bg-black/50"></div><div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-lg p-6 relative scale-95 overflow-hidden"><div id="comprar-main" class="sub-modal"><h3 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-200">Comprar pelo App</h3><div class="mb-4 flex gap-2 overflow-x-auto pb-2"><button class="comprar-category-btn flex-shrink-0 text-sm font-semibold p-2 px-4 rounded-full bg-brand-text text-white" data-category="Todos">Todos</button><button class="comprar-category-btn flex-shrink-0 text-sm font-semibold p-2 px-4 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300" data-category="Recarga">Recarga</button><button class="comprar-category-btn flex-shrink-0 text-sm font-semibold p-2 px-4 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300" data-category="Voucher">Vouchers</button><button class="comprar-category-btn flex-shrink-0 text-sm font-semibold p-2 px-4 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300" data-category="Ingresso">Ingressos</button></div><div id="comprar-list" class="grid grid-cols-2 gap-4 max-h-96 overflow-y-auto p-1"><div class="comprar-item sub-modal-trigger cursor-pointer" data-target="comprar-detalhe" data-category="Recarga" data-img="https://placehold.co/300x200/4eb999/white?text=Recarga" data-title="Recarga de Celular" data-price="R$ 20,00"><div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-md transition"><img src="https://placehold.co/300x200/4eb999/white?text=Recarga" alt="Recarga" class="w-full h-24 object-cover"><div class="p-3"><h4 class="font-semibold text-sm text-gray-800 dark:text-gray-200">Recarga de Celular</h4><p class="brand-text font-bold">R$ 20,00</p></div></div></div><div class="comprar-item sub-modal-trigger cursor-pointer" data-target="comprar-detalhe" data-category="Voucher" data-img="https://placehold.co/300x200/855ca0/white?text=iFood" data-title="Créditos iFood" data-price="R$ 50,00"><div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-md transition"><img src="https://placehold.co/300x200/855ca0/white?text=iFood" alt="iFood" class="w-full h-24 object-cover"><div class="p-3"><h4 class="font-semibold text-sm text-gray-800 dark:text-gray-200">Créditos iFood</h4><p class="brand-text font-bold">R$ 50,00</p></div></div></div><div class="comprar-item sub-modal-trigger cursor-pointer" data-target="comprar-detalhe" data-category="Ingresso" data-img="https://placehold.co/300x200/ebb34a/white?text=Cinema" data-title="Ingresso Cinema" data-price="R$ 45,00"><div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-md transition"><img src="https://placehold.co/300x200/ebb34a/white?text=Cinema" alt="Cinema" class="w-full h-24 object-cover"><div class="p-3"><h4 class="font-semibold text-sm text-gray-800 dark:text-gray-200">Ingresso Cinema</h4><p class="brand-text font-bold">R$ 45,00</p></div></div></div></div></div><div id="comprar-detalhe" class="sub-modal absolute inset-0 bg-white dark:bg-gray-800 p-6 flex flex-col translate-x-full opacity-0"><button class="sub-modal-back text-sm font-semibold brand-text mb-4 flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Voltar</button><img id="comprar-detalhe-img" src="" alt="Produto" class="w-full h-40 object-cover rounded-lg mb-4"><h4 id="comprar-detalhe-title" class="font-bold text-xl mb-2"></h4><p id="comprar-detalhe-price" class="brand-text font-bold text-2xl mb-4"></p><button data-feedback-title="Compra Confirmada" data-feedback-message="Sua compra foi realizada com sucesso! O valor será debitado do seu saldo." class="interactive-button mt-auto w-full brand-bg text-white font-bold p-3 rounded-lg">Confirmar Compra</button></div><button class="modal-close absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">&times;</button></div></div>
+    <div id="ajuda-modal" class="modal fixed inset-0 z-50 hidden items-center justify-center"><div class="modal-backdrop absolute inset-0 bg-black/50"></div><div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-md p-6 relative scale-95"><h3 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-200">Central de Ajuda</h3><div class="relative mb-4"><input type="text" placeholder="Como podemos ajudar?" class="w-full p-2 pl-10 rounded-lg bg-gray-100 dark:bg-gray-700 border-transparent focus:border-brand-text/50 focus:ring-brand-text/50 dark:text-gray-300"><i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i></div><div class="space-y-4 max-h-96 overflow-y-auto p-1"><div class="space-y-2"><h4 class="font-semibold text-gray-700 dark:text-gray-300">Dúvidas Frequentes (FAQ)</h4><details class="text-sm bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg"><summary class="cursor-pointer font-medium text-gray-600 dark:text-gray-300">Como peço a 2ª via do cartão?</summary><p class="mt-2 text-gray-500 dark:text-gray-400">Vá em "Cartões" no menu inferior, e escolha "Solicitar 2ª via".</p></details><details class="text-sm bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg"><summary class="cursor-pointer font-medium text-gray-600 dark:text-gray-300">Onde vejo os limites?</summary><p class="mt-2 text-gray-500 dark:text-gray-400">Em "Cartões", escolha "Ver Limites".</p></details><details class="text-sm bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg"><summary class="cursor-pointer font-medium text-gray-600 dark:text-gray-300">Como desbloquear meu cartão?</summary><p class="mt-2 text-gray-500 dark:text-gray-400">Na tela inicial, use a ação rápida "Bloquear/Desbloquear" para gerenciar o status do seu cartão.</p></details></div><div class="space-y-2"><h4 class="font-semibold text-gray-700 dark:text-gray-300">Tutoriais em Vídeo</h4><div class="grid grid-cols-2 gap-2"><a href="#" class="block bg-gray-200 dark:bg-gray-700 rounded-lg p-3 text-center hover:bg-gray-300 dark:hover:bg-gray-600"><i class="fa-solid fa-play text-2xl mb-2 brand-text"></i><p class="text-xs font-semibold">Pagando com QR Code</p></a><a href="#" class="block bg-gray-200 dark:bg-gray-700 rounded-lg p-3 text-center hover:bg-gray-300 dark:hover:bg-gray-600"><i class="fa-solid fa-play text-2xl mb-2 brand-text"></i><p class="text-xs font-semibold">Consultando a rede</p></a></div></div><div class="space-y-2"><h4 class="font-semibold text-gray-700 dark:text-gray-300">Dicas de Segurança</h4><div class="flex items-start gap-3 text-sm bg-yellow-50 dark:bg-yellow-900/30 p-3 rounded-lg border-l-4 border-yellow-400"><i class="fa-solid fa-shield-halved mt-1 text-yellow-500"></i><p class="text-gray-600 dark:text-gray-300">Nunca compartilhe sua senha ou o código de segurança (CVV) do seu cartão.</p></div></div><div class="space-y-2"><h4 class="font-semibold text-gray-700 dark:text-gray-300">Canais de Atendimento</h4><div class="flex gap-3"><button data-feedback-title="Chat de Suporte" data-feedback-message="Iniciando uma conversa com um de nossos atendentes..." class="interactive-button flex-1 brand-bg/20 brand-text font-semibold p-3 rounded-lg flex items-center justify-center gap-2 hover:brand-bg/30 transition"><i class="fa-regular fa-comments"></i> Iniciar Chat</button><button data-feedback-title="Canais de Contato" data-feedback-message="SAC: 0800 123 4567 | WhatsApp: (11) 91234-5678" class="interactive-button flex-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold p-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-200 dark:hover:bg-gray-600 transition"><i class="fa-solid fa-phone"></i> Contatos</button></div></div></div><button class="modal-close absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">&times;</button></div></div>
+    <div id="perfil-modal" class="modal fixed inset-0 z-50 hidden items-center justify-center"><div class="modal-backdrop absolute inset-0 bg-black/50"></div><div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-md p-6 relative scale-95"><h3 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-200">Meu Perfil</h3><div class="space-y-4 text-sm"><div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"><strong>Nome:</strong><p>Maria Silva</p></div><div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"><strong>CPF:</strong><p>123.456.789-00</p></div><div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"><strong>Endereço:</strong><p>Rua das Flores, 123, Centro</p></div></div><button class="mt-6 w-full brand-bg text-white font-bold p-3 rounded-lg">Editar Dados</button><button class="modal-close absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">&times;</button></div></div>
+    <div id="configuracoes-modal" class="modal fixed inset-0 z-50 hidden items-center justify-center"><div class="modal-backdrop absolute inset-0 bg-black/50"></div><div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-md p-6 relative scale-95"><h3 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-200">Configurações</h3><div class="space-y-4"><div class="flex justify-between items-center"><span class="font-medium text-gray-700 dark:text-gray-300">Notificações de Compras</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" class="sr-only peer toggle-checkbox" checked><div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 toggle-label transition-colors"><span class="absolute top-0.5 left-[2px] bg-white border-gray-300 border rounded-full h-5 w-5 transition-transform toggle-ball"></span></div></label></div><div class="flex justify-between items-center"><span class="font-medium text-gray-700 dark:text-gray-300">Notificações de Promoções</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" class="sr-only peer toggle-checkbox"><div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 toggle-label transition-colors"><span class="absolute top-0.5 left-[2px] bg-white border-gray-300 border rounded-full h-5 w-5 transition-transform toggle-ball"></span></div></label></div><div class="flex justify-between items-center"><span class="font-medium text-gray-700 dark:text-gray-300">Login com Biometria</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" class="sr-only peer toggle-checkbox" checked><div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 toggle-label transition-colors"><span class="absolute top-0.5 left-[2px] bg-white border-gray-300 border rounded-full h-5 w-5 transition-transform toggle-ball"></span></div></label></div></div><button class="modal-close mt-6 w-full bg-gray-200 dark:bg-gray-700 font-bold p-3 rounded-lg">Fechar</button></div></div>
+    <!-- Modal de Feedback Genérico -->
+    <div id="action-feedback-modal" class="modal fixed inset-0 z-[60] hidden items-center justify-center"><div class="modal-backdrop absolute inset-0 bg-black/50"></div><div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-sm p-6 relative scale-95 text-center"><h3 id="feedback-modal-title" class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2"></h3><p id="feedback-modal-message" class="text-gray-600 dark:text-gray-400 mb-6"></p><button class="modal-close w-full bg-brand-text text-white font-bold p-3 rounded-lg hover:bg-opacity-90 transition">Entendi</button></div></div>
+
+<script>
+    const userData = {
+        name: "Maria Silva",
+        cards: [
+            { id: 1, type: "Cartão Servidor", balanceLabel: "Saldo do seu Cartão Servidor", number: "•••• •••• •••• 5678", balance: 4850.75, color: "#ebb34a", gradientClass: "gradient-servidor", isBlocked: false, transactions: [ { icon: "fa-utensils", store: "Restaurante Sabor", value: -75.50, date: "Hoje", category: "Alimentação" }, { icon: "fa-gas-pump", store: "Posto Central", value: -150.00, date: "Ontem", category: "Transporte" }, { icon: "fa-pills", store: "Drogaria Mais Saúde", value: -95.20, date: "2 dias atrás", category: "Contas" } ] },
+            { id: 2, type: "Vale Alimentação", balanceLabel: "Saldo do seu Vale Alimentação", number: "•••• •••• •••• 1234", balance: 780.20, color: "#4eb999", gradientClass: "gradient-alimentacao", isBlocked: false, transactions: [ { icon: "fa-shopping-cart", store: "Supermercado", value: -250.40, date: "Hoje", category: "Alimentação" }, { icon: "fa-bread-slice", store: "Padaria Doce Pão", value: -35.80, date: "Ontem", category: "Alimentação" } ] },
+            { id: 3, type: "Salário VIP", balanceLabel: "Disponível no Salário VIP", number: "•••• •••• •••• 9876", balance: 120.55, color: "#c4c3c7", gradientClass: "gradient-salario", isBlocked: true, transactions: [ { icon: "fa-film", store: "Cinema Plaza", value: -50.00, date: "Sábado", category: "Lazer" }, { icon: "fa-shirt", store: "Loja Stilo", value: -320.00, date: "Sexta-feira", category: "Lazer" }, ] },
+            { id: 4, type: "Private Label", balanceLabel: "Limite do cartão Private Label", number: "•••• •••• •••• 5555", balance: 3240.10, color: "#855ca0", gradientClass: "gradient-private", isBlocked: false, transactions: [ { icon: "fa-plane", store: "Agência de Viagens", value: -1850.00, date: "01/10", category: "Transporte" }, { icon: "fa-gift", store: "Loja de Presentes", value: -200.00, date: "29/09", category: "Lazer" }, ] },
+            { id: 5, type: "Vale Presente", balanceLabel: "Créditos do seu Vale Presente", number: "•••• •••• •••• 1111", balance: 250.00, color: "#339dd5", gradientClass: "gradient-presente", isBlocked: false, transactions: [ { icon: "fa-book", store: "Livraria Cultura", value: -89.90, date: "15/10", category: "Lazer" } ] },
+        ]
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginScreen = document.getElementById('login-screen');
+        const appContainer = document.getElementById('app-container');
+        const loginButton = document.getElementById('login-button');
+        const logoutButton = document.getElementById('logout-button');
+        const menuButton = document.getElementById('menu-button');
+        const sidebarContainer = document.getElementById('sidebar-container');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarHeader = document.getElementById('sidebar-header');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        const cardCarousel = document.getElementById('card-carousel');
+        const cardBalance = document.getElementById('card-balance');
+        const balanceLabel = document.getElementById('balance-label');
+        const transactionList = document.getElementById('transaction-list');
+        const root = document.documentElement;
+        const blockButton = document.getElementById('block-button');
+        const blockIcon = document.getElementById('block-icon');
+        const blockText = document.getElementById('block-text');
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const historyTabs = document.getElementById('history-tabs');
+        
+        const togglePasswordBtn = document.getElementById('toggle-password');
+        const passwordInput = document.getElementById('password');
+        const passwordEyeIcon = document.getElementById('password-eye-icon');
+        const toggleBalanceBtn = document.getElementById('toggle-balance');
+        const balanceEyeIcon = document.getElementById('balance-eye-icon');
+        const markAsReadBtn = document.getElementById('mark-as-read-btn');
+        const notificationDot = document.getElementById('notification-dot');
+
+        let currentCardIndex = 0;
+        let currentHistoryCategory = 'Todas';
+        let isBalanceVisible = true;
+
+        const formatCurrency = (value) => value.toLocaleString('pt-br', { style: 'currency', 'currency': 'BRL' });
+
+        const renderTransactions = (transactions) => {
+            transactionList.innerHTML = '';
+            const filteredTransactions = transactions.filter(tx => currentHistoryCategory === 'Todas' || tx.category === currentHistoryCategory);
+
+            if (filteredTransactions.length === 0) {
+                transactionList.innerHTML = `<p class="text-center text-gray-500 dark:text-gray-400 py-4">Nenhuma transação nesta categoria.</p>`;
+                return;
+            }
+
+            filteredTransactions.forEach(tx => {
+                const valueColor = tx.value < 0 ? 'text-red-500' : 'text-green-500';
+                transactionList.innerHTML += `<div class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"><div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-4"><i class="fa-solid ${tx.icon} text-gray-600 dark:text-gray-400 text-lg"></i></div><div class="flex-grow"><p class="font-semibold text-gray-800 dark:text-gray-200">${tx.store}</p><p class="text-sm text-gray-500 dark:text-gray-400">${tx.date}</p></div><p class="font-bold ${valueColor}">${formatCurrency(tx.value)}</p></div>`;
+            });
+        };
+
+        const updateBalanceVisibility = () => {
+            const card = userData.cards[currentCardIndex];
+            if (isBalanceVisible) {
+                cardBalance.textContent = formatCurrency(card.balance);
+                balanceEyeIcon.className = 'fa-solid fa-eye';
+            } else {
+                cardBalance.textContent = 'R$ ••••••';
+                balanceEyeIcon.className = 'fa-solid fa-eye-slash';
+            }
+        };
+        
+        const updateUI = (cardIndex) => {
+            const card = userData.cards[cardIndex];
+            
+            currentCardIndex = cardIndex;
+            root.style.setProperty('--accent-color', card.color);
+            sidebarHeader.className = `p-6 text-white flex items-center gap-4 transition-colors duration-500 ${card.gradientClass}`;
+            updateBalanceVisibility();
+            balanceLabel.textContent = card.balanceLabel;
+            renderTransactions(card.transactions);
+            renderBlockButtonState(card);
+        };
+        
+        const initializeApp = () => {
+            cardCarousel.innerHTML = '';
+            userData.cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = "card-item flex-shrink-0 w-64 h-40 rounded-2xl p-5 flex flex-col justify-between shadow-lg text-white gradient-brand-blue border-r-[12px] cursor-pointer";
+                cardElement.dataset.index = index;
+                cardElement.innerHTML = `<div><div class="flex justify-between items-start"><span class="font-semibold">${card.type}</span><i class="fa-solid fa-wifi -rotate-45"></i></div></div><div><p class="text-lg tracking-widest font-mono mb-1">${card.number}</p><p class="text-sm font-medium uppercase">${userData.name}</p></div>`;
+                cardElement.style.borderColor = card.color;
+                cardCarousel.appendChild(cardElement);
+            });
+            
+            if (cardCarousel.children.length > 0) {
+                cardCarousel.children[0].classList.add('active');
+            }
+            updateUI(0);
+        };
+        
+        const openSidebar = () => {
+            sidebarContainer.classList.remove('hidden');
+            setTimeout(() => {
+                sidebarBackdrop.classList.remove('opacity-0');
+                sidebar.classList.remove('-translate-x-full');
+            }, 10);
+        };
+
+        const closeSidebar = () => {
+            sidebarBackdrop.classList.add('opacity-0');
+            sidebar.classList.add('-translate-x-full');
+            setTimeout(() => sidebarContainer.classList.add('hidden'), 300);
+        };
+
+        const handleLogin = () => {
+            loginScreen.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+            appContainer.classList.add('flex');
+        };
+
+        const handleLogout = () => {
+            closeSidebar();
+            setTimeout(() => {
+                appContainer.classList.add('hidden');
+                appContainer.classList.remove('flex');
+                loginScreen.classList.remove('hidden');
+                loginScreen.classList.add('flex');
+            }, 300);
+        };
+
+        const renderBlockButtonState = (card) => {
+             if (card.isBlocked) {
+                blockIcon.className = "fa-solid fa-lock-open text-2xl text-accent";
+                blockText.textContent = "Desbloquear";
+            } else {
+                blockIcon.className = "fa-solid fa-lock text-2xl text-accent";
+                blockText.textContent = "Bloquear";
+            }
+        };
+        
+        loginButton.addEventListener('click', handleLogin);
+        logoutButton.addEventListener('click', handleLogout);
+        menuButton.addEventListener('click', openSidebar);
+        sidebarBackdrop.addEventListener('click', closeSidebar);
+
+        historyTabs.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                historyTabs.querySelector('.active').classList.remove('active');
+                e.target.classList.add('active');
+                currentHistoryCategory = e.target.dataset.category;
+                renderTransactions(userData.cards[currentCardIndex].transactions);
+            }
+        });
+        
+        cardCarousel.addEventListener('click', (e) => {
+            const clickedCard = e.target.closest('.card-item');
+            if (!clickedCard) return;
+
+            const newIndex = parseInt(clickedCard.dataset.index);
+
+            if (newIndex !== currentCardIndex) {
+                const oldActiveCard = cardCarousel.querySelector('.card-item.active');
+                if(oldActiveCard) oldActiveCard.classList.remove('active');
+                
+                clickedCard.classList.add('active');
+
+                updateUI(newIndex);
+            }
+        });
+
+        blockButton.addEventListener('click', () => {
+            const card = userData.cards[currentCardIndex];
+            card.isBlocked = !card.isBlocked;
+            renderBlockButtonState(card);
+        });
+
+        togglePasswordBtn.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            passwordEyeIcon.className = `fa-solid ${isPassword ? 'fa-eye' : 'fa-eye-slash'}`;
+        });
+
+        toggleBalanceBtn.addEventListener('click', () => {
+            isBalanceVisible = !isBalanceVisible;
+            updateBalanceVisibility();
+        });
+        
+        markAsReadBtn.addEventListener('click', () => {
+            const notifications = document.querySelectorAll('#notifications-modal .notification-item');
+            notifications.forEach(notif => {
+                notif.classList.remove('bg-blue-50', 'dark:bg-blue-900/30', 'bg-green-50', 'dark:bg-green-900/30');
+                notif.classList.add('opacity-60');
+            });
+            notificationDot.classList.add('hidden');
+            markAsReadBtn.textContent = 'Nenhuma nova notificação';
+            markAsReadBtn.disabled = true;
+            markAsReadBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        });
+
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                themeIcon.className = 'fa-solid fa-sun text-lg';
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeIcon.className = 'fa-solid fa-moon text-lg';
+            }
+        };
+
+        themeToggle.addEventListener('click', () => {
+            const newTheme = document.documentElement.classList.toggle('dark') ? 'dark' : 'light';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+        
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(savedTheme);
+
+        const openModal = (modal) => {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.querySelector('.modal-backdrop').classList.remove('opacity-0');
+                modal.querySelector('.modal-content').classList.remove('scale-95');
+            }, 10);
+        };
+
+        const closeModal = (modal) => {
+            modal.querySelector('.modal-backdrop').classList.add('opacity-0');
+            modal.querySelector('.modal-content').classList.add('scale-95');
+            setTimeout(() => {
+                 modal.classList.add('hidden');
+                 if (modal.id === 'cartoes-modal' || modal.id === 'pagar-modal' || modal.id === 'comprar-modal') {
+                    modal.querySelectorAll('.sub-modal').forEach(sm => {
+                        let mainId = '';
+                        if (modal.id === 'cartoes-modal') mainId = 'manage-card-main';
+                        if (modal.id === 'pagar-modal') mainId = 'pay-main';
+                        if (modal.id === 'comprar-modal') mainId = 'comprar-main';
+                        
+                        if (sm.id !== mainId) sm.classList.add('translate-x-full', 'opacity-0');
+                    });
+                    const main = modal.querySelector('#manage-card-main, #pay-main, #comprar-main');
+                    if(main) main.classList.remove('-translate-x-full', 'opacity-0');
+                 }
+            }, 300);
+        };
+
+        document.querySelectorAll('[data-modal-target]').forEach(button => {
+            button.addEventListener('click', () => {
+                const modalId = button.getAttribute('data-modal-target');
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    closeSidebar();
+                    const card = userData.cards[currentCardIndex];
+                    if (modalId === 'extrato-modal') populateExtratoModal(card, {});
+                    if (modalId === 'cartoes-modal') populateCartoesModal(card);
+                    openModal(modal);
+                }
+            });
+        });
+        
+        const populateExtratoModal = (card, filters) => {
+            const list = document.getElementById('extrato-modal-list');
+            list.innerHTML = '';
+            let filtered = card.transactions;
+            if (filters.search) filtered = filtered.filter(tx => tx.store.toLowerCase().includes(filters.search.toLowerCase()));
+            if (filters.type && filters.type !== 'Todas') filtered = filtered.filter(tx => filters.type === 'Entradas' ? tx.value > 0 : tx.value < 0);
+            if (filters.category && filters.category !== 'Todas') filtered = filtered.filter(tx => tx.category === filters.category);
+
+            if(filtered.length === 0) {
+                 list.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4">Nenhuma transação encontrada.</p>';
+                 return;
+            }
+            filtered.forEach(tx => {
+                const valueColor = tx.value < 0 ? 'text-red-500' : 'text-green-500';
+                 list.innerHTML += `<div class="flex items-center p-2 rounded-lg border-b border-gray-100 dark:border-gray-700"><div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mr-3"><i class="fa-solid ${tx.icon} text-gray-500 dark:text-gray-400"></i></div><div class="flex-grow"><p class="font-semibold text-sm text-gray-800 dark:text-gray-200">${tx.store}</p><p class="text-xs text-gray-500 dark:text-gray-400">${tx.date}</p></div><p class="font-bold text-sm ${valueColor}">${formatCurrency(tx.value)}</p></div>`;
+            });
+        };
+
+        const extratoSearchInput = document.getElementById('extrato-search');
+        const extratoFilterType = document.getElementById('extrato-filter-type');
+        const extratoFilterCategory = document.getElementById('extrato-filter-category');
+        
+        [extratoSearchInput, extratoFilterType, extratoFilterCategory].forEach(el => {
+            el.addEventListener('input', () => {
+                const filters = { search: extratoSearchInput.value, type: extratoFilterType.value, category: extratoFilterCategory.value };
+                populateExtratoModal(userData.cards[currentCardIndex], filters);
+            });
+        });
+        
+        const populateCartoesModal = (card) => {
+            const cardInfoContainer = document.getElementById('cartoes-modal-card-info');
+            cardInfoContainer.innerHTML = ''; // Limpa o conteúdo anterior
+            
+            const cardElement = document.createElement('div');
+            cardElement.className = "w-64 h-40 rounded-2xl p-5 flex flex-col justify-between shadow-lg text-white gradient-brand-blue border-r-[12px] mx-auto";
+            cardElement.innerHTML = `<div><div class="flex justify-between items-start"><span class="font-semibold">${card.type}</span><i class="fa-solid fa-wifi -rotate-45"></i></div></div><div><p class="text-lg tracking-widest font-mono mb-1">${card.number}</p><p class="text-sm font-medium uppercase">${userData.name}</p></div>`;
+            cardElement.style.borderColor = card.color;
+
+            cardInfoContainer.appendChild(cardElement);
+        };
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', () => closeModal(modal)));
+            modal.querySelector('.modal-backdrop').addEventListener('click', () => closeModal(modal));
+        });
+
+        const feedbackModal = document.getElementById('action-feedback-modal');
+        const feedbackTitle = document.getElementById('feedback-modal-title');
+        const feedbackMessage = document.getElementById('feedback-modal-message');
+
+        const showFeedbackModal = (title, message) => {
+            feedbackTitle.textContent = title;
+            feedbackMessage.textContent = message;
+            openModal(feedbackModal);
+        }
+
+        document.querySelectorAll('.interactive-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const title = button.dataset.feedbackTitle;
+                const message = button.dataset.feedbackMessage;
+                if(title && message) {
+                    const parentModal = button.closest('.modal');
+                    if (parentModal) closeModal(parentModal);
+                    setTimeout(() => showFeedbackModal(title, message), 350);
+                }
+            })
+        });
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.querySelectorAll('.sub-modal-trigger').forEach(trigger => {
+                trigger.addEventListener('click', () => {
+                    const main = trigger.closest('.sub-modal') || modal.querySelector('.sub-modal');
+                    const targetId = trigger.dataset.target;
+                    const targetSubModal = modal.querySelector(`#${targetId}`);
+
+                     if (trigger.id === 'transfer-continue-btn') {
+                        const ag = document.getElementById('transfer-ag').value || '0001';
+                        const conta = document.getElementById('transfer-conta').value || '12345-6';
+                        const valor = document.getElementById('transfer-valor').value || '0,00';
+                        document.getElementById('transfer-summary').innerHTML = `
+                            <p><strong>Agência:</strong> ${ag}</p>
+                            <p><strong>Conta:</strong> ${conta}</p>
+                            <p class="font-bold text-lg mt-2"><strong>Valor:</strong> R$ ${valor}</p>
+                        `;
+                    }
+                    
+                    main.classList.add('-translate-x-full', 'opacity-0');
+                    targetSubModal.classList.remove('translate-x-full', 'opacity-0');
+                });
+            });
+
+            modal.querySelectorAll('.sub-modal-back').forEach(backBtn => {
+                backBtn.addEventListener('click', () => {
+                    const parentSubModal = backBtn.closest('.sub-modal');
+                    const mainId = `#${modal.querySelector('.sub-modal').id}`;
+                    const main = modal.querySelector(mainId);
+                    
+                    main.classList.remove('-translate-x-full', 'opacity-0');
+                    parentSubModal.classList.add('translate-x-full', 'opacity-0');
+                });
+            });
+        });
+        
+        document.querySelectorAll('.comprar-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.getElementById('comprar-detalhe-img').src = item.dataset.img;
+                document.getElementById('comprar-detalhe-title').textContent = item.dataset.title;
+                document.getElementById('comprar-detalhe-price').textContent = item.dataset.price;
+            });
+        });
+
+        const comprarCategoryBtns = document.querySelectorAll('.comprar-category-btn');
+        const comprarItems = document.querySelectorAll('.comprar-item');
+        comprarCategoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                comprarCategoryBtns.forEach(b => b.classList.remove('bg-brand-text', 'text-white'));
+                btn.classList.add('bg-brand-text', 'text-white');
+                const category = btn.dataset.category;
+                comprarItems.forEach(item => {
+                    if (category === 'Todos' || item.dataset.category === category) item.style.display = 'block';
+                    else item.style.display = 'none';
+                });
+            });
+        });
+        
+        initializeApp();
+    });
+</script>
+</body>
+</html>
